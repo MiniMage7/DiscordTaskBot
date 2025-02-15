@@ -1,12 +1,17 @@
 import discord
 from discord.ext import commands
 import os
+import sqlite3
+from sqlite3 import Error
 
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 bot = commands.Bot(command_prefix='$', intents=intents)
 
+###########
+# Classes #
+###########
 
 class User:
     def __init__(self, user_id):
@@ -32,6 +37,23 @@ class Task:
         self.points_on_complete = points_on_complete
         self.points_on_fail = points_on_fail
 
+
+###################
+# Other Functions #
+###################
+
+def create_connection(path):
+    connection = None
+    try:
+        connection = sqlite3.connect(path)
+    except Error as e:
+        print(f"The error '{e}' occurred")
+    return connection
+
+
+#################
+# Bot Functions #
+#################
 
 @bot.check
 async def is_admin(ctx):
@@ -70,6 +92,15 @@ async def create_new_task_list(ctx, *args):
 @bot.event
 async def on_raw_reaction_add(ctx):
     pass
+
+
+@bot.event
+async def on_ready():
+    # Connect to database on bot start up
+    db = create_connection("DTBPRD.db")
+    # Make database tables if the dont exist yet
+    db.execute('''CREATE TABLE IF NOT EXISTS users (user_id INTEGER PRIMARY KEY, points INTEGER, task_list TEXT)''')
+    db.execute('''CREATE TABLE IF NOT EXISTS tasks (message_id INTEGER PRIMARY KEY, task_name TEXT, task_type TEXT, points_on_complete INTEGER, points_on_fail INTEGER)''')
 
 
 bot.run(os.environ['TOKEN'])
