@@ -8,6 +8,31 @@ intents.members = True
 bot = commands.Bot(command_prefix='$', intents=intents)
 
 
+class User:
+    def __init__(self, user_id):
+        self.user_id = user_id
+        self.points = 0
+        self.task_list = []
+
+    def add_task(self, task):
+        self.task_list.append(task)
+
+    def remove_task(self, task_message_id):
+        for task in self.task_list:
+            if task.message_id == task_message_id:
+                self.task_list.remove(task)
+                return
+
+
+class Task:
+    def __init__(self, message_id, task_name, task_type, points_on_complete, points_on_fail):
+        self.message_id = message_id
+        self.task_name = task_name
+        self.task_type = task_type
+        self.points_on_complete = points_on_complete
+        self.points_on_fail = points_on_fail
+
+
 @bot.check
 async def is_admin(ctx):
     return ctx.author.guild_permissions.administrator or await bot.is_owner(ctx.author)
@@ -40,6 +65,11 @@ async def create_new_task_list(ctx, *args):
     # Add the bed and check mark emojis
     await embedded_message.add_reaction('\U0001F6CF')
     await embedded_message.add_reaction('\U00002705')
+
+
+@bot.event
+async def on_raw_reaction_add(ctx):
+    pass
 
 
 bot.run(os.environ['TOKEN'])
