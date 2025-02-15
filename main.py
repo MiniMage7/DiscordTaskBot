@@ -30,10 +30,16 @@ async def create_new_task_list(ctx, *args):
         return
 
     # Create the embedded message
-    embed_var = discord.Embed(title=user.display_name + "'s Tasks")
+    embed_var = discord.Embed(title=user.display_name + "'s Tasks",
+                              description="React with \U0001F6CF to end the day\n\n" +
+                              "React with \U00002705 to add a new task")
 
     # Send the embedded message
     embedded_message = await ctx.channel.send(embed=embed_var)
+
+    # Add the bed and check mark emojis
+    await embedded_message.add_reaction('\U0001F6CF')
+    await embedded_message.add_reaction('\U00002705')
 
 
 bot.run(os.environ['TOKEN'])
