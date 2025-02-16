@@ -14,9 +14,11 @@ bot = commands.Bot(command_prefix='$', intents=intents)
 ###########
 
 class User:
-    def __init__(self, user_id):
+    def __init__(self, user_id, message_id):
         self.user_id = user_id
         self.points = 0
+        self.main_message_id = message_id
+        self.notifications_channel_id = None
         self.task_list = []
 
     def add_task(self, task):
@@ -98,9 +100,9 @@ async def on_raw_reaction_add(ctx):
 async def on_ready():
     # Connect to database on bot start up
     db = create_connection("DTBPRD.db")
-    # Make database tables if the dont exist yet
-    db.execute('''CREATE TABLE IF NOT EXISTS users (user_id INTEGER PRIMARY KEY, points INTEGER, task_list TEXT)''')
-    db.execute('''CREATE TABLE IF NOT EXISTS tasks (message_id INTEGER PRIMARY KEY, task_name TEXT, task_type TEXT, points_on_complete INTEGER, points_on_fail INTEGER)''')
+    # Make database tables if they don't exist yet
+    db.execute('''CREATE TABLE IF NOT EXISTS users (user_id INTEGER PRIMARY KEY, points INTEGER, main_message_id INTEGER, notifications_channel_id INTEGER)''')
+    db.execute('''CREATE TABLE IF NOT EXISTS tasks (message_id INTEGER PRIMARY KEY, user_id INTEGER FOREIGN KEY REFERENCES users, task_name TEXT, task_type TEXT, points_on_complete INTEGER, points_on_fail INTEGER)''')
 
 
 bot.run(os.environ['TOKEN'])
