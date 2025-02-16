@@ -102,7 +102,7 @@ async def on_ready():
     db = create_connection("DTBPRD.db")
     # Make database tables if they don't exist yet
     db.execute('''CREATE TABLE IF NOT EXISTS users (user_id INTEGER PRIMARY KEY, points INTEGER, main_message_id INTEGER, notifications_channel_id INTEGER)''')
-    db.execute('''CREATE TABLE IF NOT EXISTS tasks (message_id INTEGER PRIMARY KEY, user_id INTEGER FOREIGN KEY REFERENCES users, task_name TEXT, task_type TEXT, points_on_complete INTEGER, points_on_fail INTEGER)''')
+    db.execute('''CREATE TABLE IF NOT EXISTS tasks (message_id INTEGER PRIMARY KEY, user_id INTEGER, task_name TEXT, task_type TEXT, points_on_complete INTEGER, points_on_fail INTEGER, FOREIGN KEY (user_id) REFERENCES users)''')
 
 
 bot.run(os.environ['TOKEN'])
